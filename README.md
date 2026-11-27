@@ -1,46 +1,35 @@
-# Anna Brew PO Management
+# Anna Brew – Web + Backend (satu project)
 
-Aplikasi manajemen purchase order berbasis Next.js App Router.
+Web (Next.js) dan backend (Express + MySQL) sekarang berada di satu project. Backend yang sama juga dipakai aplikasi mobile Flutter AnnaBrew.
 
-## Menjalankan aplikasi
+## Cara menjalankan (3 langkah)
+1. Nyalakan **MySQL** di XAMPP (Start).
+2. Buka terminal di folder ini lalu: `npm install`
+3. Jalankan: `npm run dev`  (atau klik dua kali `JALANKAN.bat` di Windows)
 
-```bash
-npm install
-npm run dev
-```
+Web: http://localhost:3000   API: http://localhost:4000
 
-Buka terminal kedua untuk menjalankan API:
+Saat pertama kali jalan, backend otomatis membuat database `anna_brew`, tabel, dan data contoh. Tidak perlu import SQL. Pengaturan database ada di `backend/.env` (default XAMPP: user `root`, tanpa password).
 
-```bash
-npm run dev:backend
-```
+## Akun
+| Email | Password | Role | Keterangan |
+|---|---|---|---|
+| ayupatricia@gmail.com | Anna2026! | Manager | Login web (bisa ubah data) |
+| aliyah@gmail.com | password123 | Staff Gudang | Login mobile; di web hanya bisa melihat |
+| helixa@gmail.com | password123 | Staff | |
 
-Web tersedia di `http://localhost:3000` dan API di `http://localhost:4000/api`. Jika port 3000 sudah digunakan, Next.js dapat memilih port 3001; API development menerima kedua origin localhost tersebut. Backend menyimpan data aplikasi di MySQL; file JSON lama digunakan untuk impor awal bila tabel database masih kosong.
+Akun baru dari halaman Kelola User mendapat password awal `Anna2026!` (ubah lewat `DEFAULT_USER_PASSWORD` di `backend/.env`). Hanya Manager/Admin yang boleh menambah/ubah/hapus data di web.
 
-## Database MySQL
+## Aplikasi mobile
+Di `frontend/anna_brew/lib/config.dart` (project Flutter) alamat backend: emulator `http://10.0.2.2:4000`, HP fisik `http://IP-KOMPUTER:4000`.
 
-Buat database melalui phpMyAdmin, atau jalankan SQL berikut:
+## Perintah
+- `npm run dev` web + API sekaligus  · `npm run dev:web` / `npm run dev:api` terpisah
+- `npm run setup` jalankan ulang penyiapan database
+- `npm run set-password -- email passwordBaru` ganti password akun
+- `npm run build` lalu `npm start` untuk produksi
 
-```sql
-CREATE DATABASE anna_brew CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
-Salin `backend/.env.example` menjadi `backend/.env`, lalu isi kredensial MySQL. Saat backend dijalankan, tabel `purchase_orders`, `purchase_order_items`, `purchase_order_logs`, `suppliers`, `products`, `users`, dan `discrepancies` dibuat otomatis beserta tabel pencatatan versi skema. Jika belum ada skema aplikasi, data dari `anna_brew_data` lama atau `backend/data/anna-brew.json` diimpor satu kali. Tabel lama dipertahankan sebagai cadangan migrasi; setelah impor, tabel-tabel baru menjadi sumber data utama dan perubahan tidak ditulis kembali ke file JSON.
-
-Perintah produksi:
-
-```bash
-npm run build
-npm start
-```
-
-Untuk memeriksa backend, gunakan `npm run build:backend`; jalankan layanan produksinya dengan `npm run start:backend`.
-
-## Akun demo
-
-- Email: `ayupatricia@gmail.com`
-- Kata sandi: `Anna2026!`
-
-Sesi pengguna disimpan di `localStorage` browser. Data PO, supplier, produk, pengguna, dan discrepancy dimuat dari backend dan disimpan ke MySQL. Login demo divalidasi oleh API; kredensial demo tersedia di bawah.
-
-Konfigurasi backend berada di `backend/.env`. Untuk deployment, atur `SESSION_SECRET` ke nilai acak yang panjang, `DEMO_PASSWORD` ke password yang aman, dan `CLIENT_ORIGIN` ke origin frontend. Akun serta password bawaan ditujukan untuk demonstrasi lokal, bukan autentikasi produksi.
+## Catatan
+- Perubahan di web (supplier, produk, user, status PO, discrepancy) tersimpan ke MySQL dan langsung terlihat di aplikasi mobile, begitu juga sebaliknya (muat ulang halaman).
+- PPN 11% otomatis, sama dengan aplikasi mobile.
+- Lupa password di web masih simulasi (tidak ada layanan email); di mobile kode OTP tampil di terminal backend.

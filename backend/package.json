@@ -1,0 +1,6 @@
+{
+  "name": "anna-brew-backend",
+  "private": true,
+  "type": "commonjs",
+  "description": "Backend Express + MySQL. Dependensi dipasang dari package.json di root project (npm install sekali saja)."
+}

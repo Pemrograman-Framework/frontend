@@ -36,9 +36,11 @@ export default function Login({ onLogin }) {
   return (
     <div className="login">
       <div className="hero">
-        <div className="hero-copy"><h2>from prompt to perfect<br />logistics alignment</h2><p>Sistem Manajemen Purchase Order untuk mengelola ketidaksesuaian pemasok, verifikasi pencocokan item, dan pemantauan jadwal pengadaan secara akurat.</p></div>
+        <span className="hero-orb o1" /><span className="hero-orb o2" />
+        <img className="hero-logo" src="/anna-brew-logo-white.png" alt="Anna Brew" />
         <small>© 2026 ANNA BREW Coffee Roasters. All rights reserved.</small></div>
       <form onSubmit={submit} noValidate>
+        <img className="form-logo" src="/anna-brew-logo.png" alt="Anna Brew" />
         <h2>Masuk ke Dashboard</h2><p className="muted">Gunakan kredensial staff resmi Anda untuk mengakses sistem.</p>
         {err.form && <div className="alert"><AlertCircle size={16} /><div><b>Email atau kata sandi tidak sesuai</b><p>Periksa kembali email dan kata sandi Anda, lalu coba lagi.</p></div></div>}
         <div className={`field ${err.email || err.form ? 'bad' : ''}`}><label>Alamat Email</label><input value={email} onChange={(e) => { setEmail(e.target.value); setErr({}) }} />{err.email && <small className="msg">{err.email}</small>}</div>

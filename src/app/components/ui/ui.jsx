@@ -3,7 +3,7 @@ import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 export const Brand = ({ light }) => (
   <div className={`brand ${light ? 'brand-light' : ''}`}><img src="/anna-brew-logo.png" alt="Anna Brew — Purchase Order Management System" /></div>
 )
-const tone = { Selesai: 'green', Aktif: 'green', 'Sedang Dikirim': 'blue', 'Menunggu Konfirmasi': 'amber', 'Menunggu Review': 'amber', Overdue: 'red', Ditolak: 'red', Nonaktif: 'red', Ditutup: 'gray', Manager: 'amber', Admin: 'blue', Staff: 'green' }
+const tone = { Selesai: 'green', Aktif: 'green', 'Sedang Dikirim': 'blue', 'Menunggu Konfirmasi': 'amber', 'Menunggu Review': 'amber', Overdue: 'red', Ditolak: 'red', Nonaktif: 'red', Ditutup: 'gray', Manager: 'amber', Admin: 'blue', Staff: 'green', 'Staff Gudang': 'green' }
 export const Badge = ({ t }) => <span className={`badge ${tone[t] || 'gray'}`}>{t}</span>
 
 export function Modal({ title, sub, onClose, children, w = 440 }) {

@@ -7,10 +7,10 @@ export default function Users({ c }) {
   const { db, set, notify } = c, [rs, setRs] = useState(null), [done, setDone] = useState(false)
   const close = () => { setRs(null); setDone(false) }
   return (
-    <Crud name="user" addLabel="Tambah User" sub="user" rows={db.users} blank={{ nama: '', email: '', lokasi: '', role: '', st: 'Aktif', gabung: '25 Jan 2026' }}
+    <Crud name="user" addLabel="Tambah User" sub="user" rows={db.users} blank={{ nama: '', email: '', lokasi: '', role: '', st: 'Aktif', gabung: '' }}
       cols={[{ k: 'nama', l: 'NAMA', bold: true }, { k: 'email', l: 'EMAIL' }, { k: 'lokasi', l: 'LOKASI' }, { k: 'role', l: 'ROLE', render: (r) => <Badge t={r.role} /> }]}
-      fields={[{ k: 'nama', l: 'Nama Lengkap', req: 1, full: 1 }, { k: 'email', l: 'Alamat Email', req: 1, type: 'email', full: 1 }, { k: 'lokasi', l: 'Lokasi', req: 1, full: 1 }, { k: 'role', l: 'Role', req: 1, opts: ['Admin', 'Manager', 'Staff'] }, { k: 'st', l: 'Status Akun', opts: ['Aktif', 'Nonaktif'] }]}
-      onSave={(r, isNew) => { set('users', (l) => (isNew ? [...l, r] : l.map((x) => (x.id === r.id ? r : x)))); notify('User berhasil disimpan!', `${r.nama} (${r.role}).${isNew ? ' Data demo tersimpan di browser; email dan password baru tidak dibuat.' : ''}`) }}
+      fields={[{ k: 'nama', l: 'Nama Lengkap', req: 1, full: 1 }, { k: 'email', l: 'Alamat Email', req: 1, type: 'email', full: 1 }, { k: 'lokasi', l: 'Lokasi', req: 1, full: 1 }, { k: 'role', l: 'Role', req: 1, opts: ['Admin', 'Manager', 'Staff', 'Staff Gudang'] }, { k: 'st', l: 'Status Akun', opts: ['Aktif', 'Nonaktif'] }]}
+      onSave={(r, isNew) => { set('users', (l) => (isNew ? [...l, r] : l.map((x) => (x.id === r.id ? r : x)))); notify('User berhasil disimpan!', `${r.nama} (${r.role}).${isNew ? ' Password awal: Anna2026! (bisa diganti lewat Lupa Password).' : ''}`) }}
       onDelete={(r) => { set('users', (l) => l.filter((x) => x.id !== r.id)); notify('User dihapus', r.nama) }}
       extra={(r) => <button className="icon amber" title="Reset password" onClick={() => setRs(r)}><KeyRound size={14} /></button>}
       extraModal={rs && (

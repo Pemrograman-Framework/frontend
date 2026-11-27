@@ -4,31 +4,32 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "dev:backend": "tsx watch backend/src/server.ts",
+    "dev": "concurrently -k -n WEB,API -c blue,green \"npm:dev:web\" \"npm:dev:api\"",
+    "dev:web": "next dev",
+    "dev:api": "node --watch backend/server.js",
+    "dev:backend": "node --watch backend/server.js",
+    "setup": "node backend/scripts/setup.js",
+    "set-password": "node backend/scripts/set-password.js",
     "build": "next build",
-    "build:backend": "tsc -p backend/tsconfig.json",
-    "start": "next start",
-    "start:backend": "tsx backend/src/server.ts",
+    "start": "concurrently -k -n WEB,API \"next start\" \"node backend/server.js\"",
+    "start:backend": "node backend/server.js",
     "lint": "oxlint",
     "preview": "next start"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^1.52.0",
     "mysql2": "^3.24.6",
-    "next": "16.4.6",
+    "next": "^16.4.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.0",
-    "@types/node": "^22.13.4",
-    "oxlint": "^1.81.0",
-    "tsx": "^4.19.3",
-    "typescript": "^5.7.3"
+    "concurrently": "^9.1.2",
+    "oxlint": "^1.81.0"
   }
 }

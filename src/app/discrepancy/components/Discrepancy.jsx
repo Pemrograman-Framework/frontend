@@ -14,7 +14,7 @@ export default function Discrepancy({ c }) {
     if (!d) return <><button className="btn" onClick={() => go('/discrepancy')}><ArrowLeft size={14} /> Kembali ke Daftar Discrepancy</button><p className="empty">Laporan discrepancy tidak ditemukan.</p></>
     return (
       <>
-        <div className="between"><button className="btn" onClick={() => go('/discrepancy')}><ArrowLeft size={14} /> Kembali ke Daftar Discrepancy</button></div>
+        <div className="discrepancy-top"><button className="btn" onClick={() => go('/discrepancy')}><ArrowLeft size={14} /> Kembali ke Daftar Discrepancy</button><Badge t={d.st} /></div>
         <div className="card pad detail discrepancy-detail">
           <div className="between"><h4>Detail Discrepancy</h4><small className="muted">ID Laporan: {d.id} · {d.po}</small></div>
           <div className="grid2">
@@ -22,7 +22,7 @@ export default function Discrepancy({ c }) {
             <div><h5>Deskripsi Masalah</h5><p className="notebox">{d.desc}</p></div>
           </div>
           <h5>Informasi Laporan</h5>
-          <dl className="kv"><dt>No Purchase Order</dt><dd>{d.po}</dd><dt>Supplier</dt><dd>{d.sup}</dd><dt>Jenis Masalah</dt><dd className="redt">{d.jenis}</dd><dt>Tanggal Laporan</dt><dd>{d.tgl}</dd><dt>Total Kerugian</dt><dd className="redt">{rp(d.rugi)}</dd><dt>Kuantitas Kurang</dt><dd className="redt">{d.qty}</dd><dt>Pengirim Laporan</dt><dd>{d.by}</dd><dt>Status</dt><dd><Badge t={d.st} /></dd></dl>
+          <dl className="kv"><dt>No Purchase Order</dt><dd>{d.po}</dd><dt>Supplier</dt><dd>{d.sup}</dd><dt>Jenis Masalah</dt><dd className="redt">{d.jenis}</dd><dt>Tanggal Laporan</dt><dd>{d.tgl}</dd><dt>Total Kerugian</dt><dd className="redt">{rp(d.rugi)}</dd><dt>Kuantitas Kurang</dt><dd className="redt">{d.qty}</dd><dt>Pengirim Laporan</dt><dd>{d.by}</dd></dl>
           <div className="discrepancy-actions">
             <button className="btn primary" disabled={d.st === 'Selesai' || d.st === 'Ditutup'} onClick={() => upd('Selesai', 'ditandai selesai.')}><CheckCircle2 size={14} /> Tandai Selesai</button>
             <button className="btn" disabled={d.st === 'Selesai' || d.st === 'Ditutup'} onClick={() => upd('Menunggu Review', `permintaan klarifikasi dikirim ke ${d.sup}.`)}>Minta Klarifikasi</button>

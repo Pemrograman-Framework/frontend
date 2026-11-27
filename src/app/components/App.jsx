@@ -15,8 +15,8 @@ import MasterData from '../master/components/MasterData.jsx'
 import Users from '../users/components/Users.jsx'
 
 const titles = {
-  dashboard: ['Dashboard Analitik', 'Periode data demo: Januari 2026'],
-  monitoring: ['Monitoring PO', 'Data demo Januari 2026 — {n} Purchase Order'],
+  dashboard: ['Dashboard Analitik', 'Ringkasan purchase order & discrepancy terkini'],
+  monitoring: ['Monitoring PO', 'Daftar {n} Purchase Order'],
   discrepancy: ['Review Discrepancy', ''],
   master: ['Kelola Master Data', 'Manajemen supplier & katalog produk kopi'],
   users: ['Kelola User Staff', 'Manajemen akun & hak akses pengguna sistem'],
@@ -28,7 +28,9 @@ export default function App() {
   const [dbLoaded, setDbLoaded] = useState(false)
   const [apiError, setApiError] = useState('')
   const dbRef = useRef(seed)
-  const writeQueues = useRef({})
+  const writeQueue = useRef(Promise.resolve())
+  const pending = useRef(0)
+  const idMap = useRef({})
   const pathname = usePathname()
   const router = useRouter()
   const [q, setQ] = useState('')
@@ -60,28 +62,71 @@ export default function App() {
     return () => { active = false }
   }, [setUser, user, userLoaded])
   const go = (p) => { router.push(p); window.scrollTo(0, 0) }
+  // Kirim satu perubahan ke backend (id sementara dari item baru diganti id asli dari server)
+  const send = async (key, op) => {
+    const real = (id) => idMap.current[key + ':' + id] ?? id
+    let path = `${apiBaseUrl}/data/${key}`
+    let body
+    if (op.method === 'POST') body = op.item
+    else {
+      path += `/${encodeURIComponent(real(op.item.id))}`
+      if (op.method === 'PUT') {
+        body = key === 'pos' ? { st: op.item.st, logs: op.item.logs.slice(op.old.logs.length) } : op.item
+      }
+    }
+    const response = await fetch(path, {
+      method: op.method,
+      credentials: 'include',
+      headers: body ? { 'Content-Type': 'application/json' } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+    })
+    if (response.status === 401) {
+      setUser(null)
+      throw new Error('Sesi berakhir. Silakan masuk kembali.')
+    }
+    const data = await response.json().catch(() => ({}))
+    if (!response.ok) throw new Error(data.message || 'Perubahan gagal disimpan ke backend.')
+    if (op.method === 'POST' && data.item) idMap.current[key + ':' + op.item.id] = data.item.id
+  }
+  const reload = async () => {
+    try {
+      const response = await fetch(`${apiBaseUrl}/data`, { credentials: 'include' })
+      if (!response.ok) return
+      const data = await response.json()
+      dbRef.current = data
+      setDb(data)
+    } catch {}
+  }
   const set = (key, value) => {
-    const collection = typeof value === 'function' ? value(dbRef.current[key]) : value
-    const next = { ...dbRef.current, [key]: collection }
-    dbRef.current = next
-    setDb(next)
-    writeQueues.current[key] = (writeQueues.current[key] || Promise.resolve())
-      .catch(() => {})
-      .then(() => fetch(`${apiBaseUrl}/data/${key}`, {
-        method: 'PUT',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(collection),
-      }))
-      .then(async (response) => {
-        if (response.status === 401) {
-          setUser(null)
-          throw new Error('Sesi berakhir. Silakan masuk kembali.')
+    const prev = dbRef.current[key]
+    const collection = typeof value === 'function' ? value(prev) : value
+    dbRef.current = { ...dbRef.current, [key]: collection }
+    setDb(dbRef.current)
+    const before = new Map(prev.map((x) => [x.id, x]))
+    const after = new Set(collection.map((x) => x.id))
+    const ops = []
+    for (const item of collection) {
+      const old = before.get(item.id)
+      if (!old) ops.push({ method: 'POST', item })
+      else if (JSON.stringify(old) !== JSON.stringify(item)) ops.push({ method: 'PUT', item, old })
+    }
+    for (const item of prev) if (!after.has(item.id)) ops.push({ method: 'DELETE', item })
+    if (!ops.length) return
+    pending.current += 1
+    writeQueue.current = writeQueue.current
+      .then(async () => {
+        try {
+          for (const op of ops) await send(key, op)
+          setApiError('')
+        } catch (error) {
+          setApiError(error.message || 'Perubahan belum tersimpan ke backend. Periksa server lalu muat ulang aplikasi.')
         }
-        if (!response.ok) throw new Error('Perubahan gagal disimpan ke backend.')
-        setApiError('')
       })
-      .catch(() => setApiError('Perubahan belum tersimpan ke backend. Periksa server lalu muat ulang aplikasi.'))
+      .then(() => {
+        pending.current -= 1
+        // Setelah semua perubahan terkirim, ambil data asli dari server (id, total, status terbaru)
+        if (pending.current === 0) return reload()
+      })
   }
   const notify = (title, msg) => setToast({ title, msg, id: Date.now() })
   const logout = () => {
